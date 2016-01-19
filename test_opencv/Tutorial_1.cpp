@@ -196,19 +196,91 @@ bool MultiChannelBlending()
  **/
 void erode()
 {
-    Mat src = imread(filePath+imageName1);
-    Mat e = getStructuringElement(MORPH_RECT, Size(15,15));
-    Mat dst ;
-    erode(src, dst, e);
+    Mat src = imread(filePath+imageName1);//源图像
+    Mat kornel = getStructuringElement(MORPH_RECT, Size(15,15));//核矩阵，作为腐蚀的程度
+    Mat dst ;//结果存储
+    erode(src, dst, kornel);
     imshow(windowName1, dst);
-    waitKey();
+}
+
+//图像模糊
+void blur()
+{
+    Mat src = imread(filePath+imageName1);
+    Mat dst;
+    imshow(windowName1,src);
+    blur(src, dst, Size(1,1));
+    imshow(windowName2, dst);
+}
+
+//边缘检测
+void canny()
+{
+    Mat src = imread(filePath+imageName1);
+    Mat dst,edgt,grayImage;
+    dst.create(src.size(),src.type());
+    
+    cvtColor(src, grayImage, COLOR_BGR2GRAY);
+    imshow(windowName2, grayImage);
+
+    blur(grayImage, edgt, Size(5,5));
+    Canny(edgt, edgt, 3, 9,3);
+    
+    imshow(windowName1, edgt);
+
+    
+}
+//从摄像头读入视频帧
+void videoCapture()
+{
+    //方法1
+    VideoCapture capture;
+    capture.open(0);
+    
+    //方法2
+    //VideoCapture capture(0);
+    
+    Mat frame;
+    while (true) {
+        capture>>frame;
+        imshow("video", frame);
+        if(waitKey(33)==27)
+        {
+            break;
+        }
+    }
+}
+
+//从摄像头获取视频帧，做高斯模糊，canny边缘检测
+void videoCaptureAndBlurAndCanny()
+{
+    VideoCapture capture;
+    capture.open(0);
+    Mat frame;
+    Mat gray;
+    Mat edget;
+    while (1) {
+        capture>>frame;
+        
+    
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+        
+        //使用内核3 x 3(2X3+1＝7)来去噪
+        blur(gray, edget, Size(7,7));
+        //边缘检测
+        Canny(edget, edget, 0,30,3);
+        
+        imshow("video", edget);
+        if(waitKey(33)==27)break;
+        
+    }
 }
 int main( )
 {
 //    simpleDisplayImage();
 //    addWeightROI();
 //    copyROI();
-    erode();
+    videoCaptureAndBlurAndCanny();
     char c = waitKey();
     while (c!=27) {
         c=waitKey();
