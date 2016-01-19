@@ -1,5 +1,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 using namespace cv;
 using namespace std;
 
@@ -13,6 +15,7 @@ String imageName2 = "dota_logo.jpg";
 
 
 /**
+ 1
  显示图片
  **/
 void simpleDisplayImage()
@@ -32,6 +35,7 @@ void simpleDisplayImage()
 
 
 /**
+ 2
  两种图片叠加，获取图片的感兴趣的区域
  **/
 void addWeightROI()
@@ -57,7 +61,8 @@ void addWeightROI()
 }
 
 /**
- 
+ 3
+ 加载掩模 感兴趣区域
  **/
 bool copyROI()
 {
@@ -83,7 +88,7 @@ bool copyROI()
     return true;
 }
 
-
+//图像的三个通道 的颜色分离和合并
 bool MultiChannelBlending()
 {
     //【0】定义相关变量
@@ -116,7 +121,7 @@ bool MultiChannelBlending()
     merge(channels,srcImage);
     
     //【6】显示效果图
-    namedWindow(windowName1+1);
+    namedWindow(windowName1+1,WINDOW_AUTOSIZE);
     imshow(windowName1+1,srcImage);
     
     
@@ -184,12 +189,26 @@ bool MultiChannelBlending()
 
     return true;
 }
+
+
+/**
+ 图像腐蚀
+ **/
+void erode()
+{
+    Mat src = imread(filePath+imageName1);
+    Mat e = getStructuringElement(MORPH_RECT, Size(15,15));
+    Mat dst ;
+    erode(src, dst, e);
+    imshow(windowName1, dst);
+    waitKey();
+}
 int main( )
 {
 //    simpleDisplayImage();
 //    addWeightROI();
 //    copyROI();
-    MultiChannelBlending();
+    erode();
     char c = waitKey();
     while (c!=27) {
         c=waitKey();
