@@ -1,6 +1,4 @@
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
@@ -21,7 +19,7 @@ String imageName2 = "dota_logo.jpg";
 void simpleDisplayImage()
 {
     //1 get the Mat data of  a Image
-    Mat matImage1=imread(filePath+imageName1);
+    Mat matImage1=imread(filePath+imageName1,CV_LOAD_IMAGE_GRAYSCALE);
     
     //2 create a window to show the image
     namedWindow(windowName1);
@@ -186,7 +184,7 @@ bool MultiChannelBlending()
     //【6】显示效果图
     namedWindow(windowName1+3);
     imshow(windowName1+3,srcImage);
-
+    
     return true;
 }
 
@@ -222,12 +220,12 @@ void canny()
     
     cvtColor(src, grayImage, COLOR_BGR2GRAY);
     imshow(windowName2, grayImage);
-
+    
     blur(grayImage, edgt, Size(5,5));
     Canny(edgt, edgt, 3, 9,3);
     
     imshow(windowName1, edgt);
-
+    
     
 }
 //从摄像头读入视频帧
@@ -262,7 +260,6 @@ void videoCaptureAndBlurAndCanny()
     while (1) {
         capture>>frame;
         
-    
         cvtColor(frame, gray, COLOR_BGR2GRAY);
         
         //使用内核3 x 3(2X3+1＝7)来去噪
@@ -275,12 +272,167 @@ void videoCaptureAndBlurAndCanny()
         
     }
 }
+
+
+
+//进度条的track bar 使用的全局变量
+int g_nContrastValue; //对比度值
+int g_nBrightValue;  //亮度值
+Mat g_srcImage,g_dstImage;
+//回调函数
+void ContrastAndBright(int, void *)
+{
+    
+    
+    // 三个for循环，执行运算 g_dstImage(i,j) = a*g_srcImage(i,j) + b
+    for( int y = 0; y < g_srcImage.rows; y++ )
+    {
+        for( int x = 0; x < g_srcImage.cols; x++ )
+        {
+            for( int c = 0; c < 3; c++ )
+            {
+                g_dstImage.at<Vec3b>(y,x)[c] = saturate_cast<uchar>( (g_nContrastValue*0.01)*( g_srcImage.at<Vec3b>(y,x)[c] ) + g_nBrightValue );
+            }
+        }
+    }
+    printf("对比度:%d  ,亮度：%d \n",g_nContrastValue,g_nBrightValue);
+    
+    // 显示图像
+    imshow(windowName1, g_srcImage);//源图像都没有变
+    imshow(windowName2, g_dstImage);//变得都是目的图像
+}
+//进度条 小程序
+void track()
+{
+    //改变控制台前景色和背景色
+    system("color 5F");
+    
+    // 读入用户提供的图像
+    g_srcImage = imread(filePath+imageName1);
+    if( !g_srcImage.data ) { printf("Oh，no，读取g_srcImage图片错误~！ \n"); return ; }
+    g_dstImage = Mat::zeros( g_srcImage.size(), g_srcImage.type() );
+    
+    //设定对比度和亮度的初值
+    g_nContrastValue=80;
+    g_nBrightValue=80;
+    
+    // 创建窗口
+    namedWindow(windowName1);//源图像窗口
+    namedWindow(windowName2);//目的图像窗口
+    
+    // 显示图像
+    imshow(windowName1, g_srcImage);//源图像都没有变
+    imshow(windowName2, g_dstImage);//变得都是目的图像
+    
+    //创建轨迹条
+    createTrackbar("对比度：", windowName1,&g_nContrastValue, 300,ContrastAndBright );
+    createTrackbar("亮   度：", windowName2,&g_nBrightValue, 200,ContrastAndBright );
+    
+    //调用回调函数
+    //    ContrastAndBright(g_nContrastValue,0);//回调函数可以写，也可以不写
+    //    ContrastAndBright(g_nBrightValue,0);//回调函数可以写，也可以不写
+    
+    cout<<"lalalala:"<< getTrackbarPos("对比度：", windowName1);
+    //输出一些帮助信息
+    cout<<endl<<"\t嗯。好了，请调整滚动条观察图像效果~\n\n"
+    <<"\t按下“esc”键时，程序退出~!\n";
+}
+
+
+
+
+//鼠标程序，全局变量
+Rect g_rectangle;
+bool g_bDrawingBox = false;//是否进行绘制
+RNG g_rng(12345);
+//画矩形函数，是鼠标小程序的辅助
+void DrawRectangle(cv::Mat& image,cv::Rect box)
+{
+    rectangle(image,
+              box.tl(),
+              box.br(),
+              //随机颜色
+              Scalar(g_rng.uniform(0,255),g_rng.uniform(0,255 ),g_rng.uniform(0,255)));
+    
+}
+//鼠标程序回调函数
+void on_MouseHandle(int event,int x,int y,int flags,void*param)
+{
+    Mat& image = *(cv::Mat*)param;
+    switch (event) {
+            
+            //鼠标移动消息
+        case EVENT_MOUSEMOVE:
+            if(g_bDrawingBox)
+            {
+                g_rectangle.width=x-g_rectangle.x;
+                g_rectangle.height=y-g_rectangle.y;
+            }
+            break;
+            //左键按下
+        case EVENT_LBUTTONDOWN:
+        {
+            g_bDrawingBox=true;
+            g_rectangle=Rect(x,y,0,0);//记录起始点
+        }
+            break;
+            //左键抬起
+        case EVENT_LBUTTONUP:
+            g_bDrawingBox=false;
+            if(g_rectangle.width<0)
+            {
+                g_rectangle.x+=g_rectangle.width;
+                g_rectangle.width*=-1;
+            }
+            if(g_rectangle.height<0)
+            {
+                g_rectangle.y+=g_rectangle.height;
+                g_rectangle.height*=-1;
+            }
+            DrawRectangle(image, g_rectangle);
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
+//鼠标程序
+void testMouse()
+{
+    //1前期准备，设置参数
+    g_rectangle=Rect(-1,-1,0,0);
+    Mat srcImage(600,800,CV_8UC3),tempImage;
+    srcImage.copyTo(tempImage);
+    srcImage=Scalar::all(1);
+    
+    namedWindow(windowName1);
+    
+    //2设置回调参数
+    setMouseCallback(windowName1, on_MouseHandle,(void*)&srcImage);
+    
+    //3程序主循环
+    while (true) {
+        srcImage.copyTo(tempImage);//复制原图到临时变量
+        if(g_bDrawingBox)
+        {
+            DrawRectangle(tempImage,g_rectangle);
+        }
+        imshow(windowName1, tempImage);
+        if(waitKey(33)==27)break;
+    }
+    
+}
 int main( )
 {
-//    simpleDisplayImage();
-//    addWeightROI();
-//    copyROI();
-    videoCaptureAndBlurAndCanny();
+    //    simpleDisplayImage();
+    //    addWeightROI();
+    //    copyROI();
+    Mat A,B,C;
+    A = imread(filePath+imageName1);
+    B = A(Range::all(),Range(1,3));
+    testMouse();
     char c = waitKey();
     while (c!=27) {
         c=waitKey();
