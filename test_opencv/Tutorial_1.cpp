@@ -50,6 +50,8 @@ void addWeightROI()
     //imageROI=image(Range(350,350+logo.rows),Range(800,800+logo.cols));
     //将logo加到原图上
     //第一个数字是第一张mat的透明度，第二个数字是第二张mat的透明度
+    
+    // 公式 ：dst = src1[x]*alpha + src2[x]*beta +gamma; x是多维数组元素的索引值
     addWeighted(imageROI,0.5,matImage2,0.5,1,imageROI);
     //显示结果
     namedWindow(windowName2);
@@ -62,7 +64,7 @@ void addWeightROI()
  3
  加载掩模 感兴趣区域
  **/
-bool copyROI()
+bool copyROIWithMask()
 {
     //【1】读入图像
     Mat srcImage1= imread(filePath+imageName1);
@@ -72,16 +74,17 @@ bool copyROI()
     
     //【2】定义一个Mat类型并给其设定ROI区域
     Mat imageROI= srcImage1(Rect(200,250,logoImage.cols,logoImage.rows));
-    
+    Mat src2 = srcImage1.clone();
     //【3】加载掩模（必须是灰度图）
-    Mat mask= imread("dota_logo.jpg",0);
+    Mat ma= imread(filePath+imageName2);
     
     //【4】将掩膜拷贝到ROI
-    logoImage.copyTo(imageROI,mask);
+    logoImage.copyTo(imageROI,ma);
     
     //【5】显示结果
-    namedWindow("<1>利用ROI实现图像叠加示例窗口");
-    imshow("<1>利用ROI实现图像叠加示例窗口",srcImage1);
+    imshow(windowName1,srcImage1);
+    imshow(windowName2,src2);
+
     
     return true;
 }
@@ -273,7 +276,8 @@ void videoCaptureAndBlurAndCanny()
     }
 }
 
-
+//对比度和亮度调节公式：g(x)=a*f(x)+b ＝>  g(i,j)=a*f(i,j)+b
+//a是调节对比度，b是偏置，调节亮度
 
 //进度条的track bar 使用的全局变量
 int g_nContrastValue; //对比度值
@@ -291,7 +295,13 @@ void ContrastAndBright(int, void *)
         {
             for( int c = 0; c < 3; c++ )
             {
-                g_dstImage.at<Vec3b>(y,x)[c] = saturate_cast<uchar>( (g_nContrastValue*0.01)*( g_srcImage.at<Vec3b>(y,x)[c] ) + g_nBrightValue );
+                g_dstImage.at<Vec3b>(y,x)[c] =
+                saturate_cast<uchar>
+                (
+                   ( g_nContrastValue*0.01)*
+                   ( g_srcImage.at<Vec3b>(y,x)[c] ) +
+                     g_nBrightValue
+                );
             }
         }
     }
@@ -424,6 +434,32 @@ void testMouse()
     }
     
 }
+
+
+//减少颜色空间数
+void colorReduce(Mat & inputImage,Mat &outputImage ,int div)
+{
+    outputImage = inputImage.clone();
+    int rowNumber = outputImage.rows;
+    int colNumber = outputImage.cols;
+    
+    for(int i =0;i<rowNumber;i++)
+    {
+        //后面加或不加的区别是 图片的模糊程度
+        for (int j =0; j<colNumber; j++) {
+            outputImage.at<Vec3b>(i,j)[0]=outputImage.at<Vec3b>(i,j)[0]/div *div+div/2 ;
+            outputImage.at<Vec3b>(i,j)[1]=outputImage.at<Vec3b>(i,j)[1]/div *div+div/2 ;
+            outputImage.at<Vec3b>(i,j)[2]=outputImage.at<Vec3b>(i,j)[2]/div *div +div/2;
+
+        }
+        
+//        //第二种方法
+//        uchar* data = outputImage.ptr<uchar>(i);
+//        for (int j=0; j<colNumber; j++) {
+//            data[j]=data[j]/div * div + div/2;
+//        }
+    }
+}
 int main( )
 {
     //    simpleDisplayImage();
@@ -431,8 +467,16 @@ int main( )
     //    copyROI();
     Mat A,B,C;
     A = imread(filePath+imageName1);
-    B = A(Range::all(),Range(1,3));
-    testMouse();
+
+    vector<Mat> channels ;
+    split(A, channels);
+    imshow("1", channels.at(0));
+    imshow("2", channels.at(1));
+    imshow("3", channels.at(2));
+    imshow("4", A);
+    
+    merge(channels,B);
+    imshow("B", B);
     char c = waitKey();
     while (c!=27) {
         c=waitKey();
