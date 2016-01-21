@@ -460,23 +460,36 @@ void colorReduce(Mat & inputImage,Mat &outputImage ,int div)
 //        }
     }
 }
-int main( )
+
+//图像膨胀操作
+void dilate()
+{
+    Mat A,B,C;
+    A = imread(filePath+imageName1);
+    imshow("A", A);
+    
+    Mat element = getStructuringElement(MORPH_RECT, Size(3,3));
+    dilate(A, B, element);
+    imshow("B", B);
+}
+
+//图像腐蚀操作
+void erodeImage()
+{
+    
+    Mat A,B,C;
+    A = imread(filePath+imageName1);
+    imshow("A", A);
+    Mat element = getStructuringElement(MORPH_RECT, Size(3,3));
+    erode(A, B, element);
+    imshow("B", B);
+}
+int main()
 {
     //    simpleDisplayImage();
     //    addWeightROI();
     //    copyROI();
-    Mat A,B,C;
-    A = imread(filePath+imageName1);
-
-    vector<Mat> channels ;
-    split(A, channels);
-    imshow("1", channels.at(0));
-    imshow("2", channels.at(1));
-    imshow("3", channels.at(2));
-    imshow("4", A);
-    
-    merge(channels,B);
-    imshow("B", B);
+    erodeImage();
     char c = waitKey();
     while (c!=27) {
         c=waitKey();
