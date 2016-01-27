@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A7E03AE1C4E1FAA008D4B25 /* facedetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A7E03AD1C4E1FAA008D4B25 /* facedetect.cpp */; };
+		0AAF032E1C54B7AB00635F6F /* tes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AAF032D1C54B7AB00635F6F /* tes.cpp */; };
 		0AB71AF11C48D47C00E69746 /* libopencv_core.3.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB71AF01C48D47C00E69746 /* libopencv_core.3.1.0.dylib */; };
 		0AB71AF31C48D55A00E69746 /* libopencv_highgui.3.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB71AF21C48D55A00E69746 /* libopencv_highgui.3.1.0.dylib */; };
 		0AB71AF51C48D5A400E69746 /* libopencv_imgproc.3.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB71AF41C48D5A400E69746 /* libopencv_imgproc.3.1.0.dylib */; };
@@ -72,6 +73,7 @@
 		0A61415D1C4A7D0A008EB17B /* dota.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = dota.jpg; path = "../../../../Desktop/OpenCVdemo1 by浅墨/OpenCVdemo1/OpenCVdemo1/dota.jpg"; sourceTree = "<group>"; };
 		0A61415E1C4A7D0A008EB17B /* girl.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = girl.jpg; path = "../../../../Desktop/OpenCVdemo1 by浅墨/OpenCVdemo1/OpenCVdemo1/girl.jpg"; sourceTree = "<group>"; };
 		0A7E03AD1C4E1FAA008D4B25 /* facedetect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = facedetect.cpp; path = "../../../../opencv-3.1.0/samples/cpp/facedetect.cpp"; sourceTree = "<group>"; };
+		0AAF032D1C54B7AB00635F6F /* tes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tes.cpp; sourceTree = "<group>"; };
 		0AB71AF01C48D47C00E69746 /* libopencv_core.3.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.3.1.0.dylib; path = "../../../opencv-3.1.0/build/lib/libopencv_core.3.1.0.dylib"; sourceTree = "<group>"; };
 		0AB71AF21C48D55A00E69746 /* libopencv_highgui.3.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.3.1.0.dylib; path = "../../../opencv-3.1.0/build/lib/libopencv_highgui.3.1.0.dylib"; sourceTree = "<group>"; };
 		0AB71AF41C48D5A400E69746 /* libopencv_imgproc.3.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.3.1.0.dylib; path = "../../../opencv-3.1.0/build/lib/libopencv_imgproc.3.1.0.dylib"; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				0ADAF6501C43F0DD00BA7605 /* main.cpp */,
 				0AB71B491C492C8900E69746 /* Tutorial_1.cpp */,
 				0AB71B4A1C492C8900E69746 /* Tutorial_1.hpp */,
+				0AAF032D1C54B7AB00635F6F /* tes.cpp */,
 			);
 			path = test_opencv;
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AAF032E1C54B7AB00635F6F /* tes.cpp in Sources */,
 				0ADAF6511C43F0DD00BA7605 /* main.cpp in Sources */,
 				0AB71B4B1C492C8900E69746 /* Tutorial_1.cpp in Sources */,
 				0A7E03AE1C4E1FAA008D4B25 /* facedetect.cpp in Sources */,
